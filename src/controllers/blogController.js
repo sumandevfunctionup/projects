@@ -1,11 +1,12 @@
 const blogModel = require("../models/blogModel")
 const authorModel = require("../models/authorModel")
+const moment = require("moment")
+const { months } = require("moment")
 
 const createBlog = async function (req, res) {
     try {
         const data = req.body
         const id = req.body.authorId
-
         if (!Object.keys(data).length > 0) return res.send({ error: "Please enter data" })
 
         const findAuthor = await authorModel.find({ _id: id })
@@ -48,7 +49,10 @@ const updateBlog= async function (req, res) {
     if( !id )  return res.status(400).send({error : " Please enter id in Params"})
     if ( !data )  return res.status(400).send({ error : "Enter some data to update"})     
 
-    const updatedData = await blogModel.updateMany( { _id : id } , { $set : data} , { new : true})
+    const timeDate = moment()
+
+    const dataforUpdation = { ...data , isPublished : true , publishedAt : timeDate}
+    const updatedData = await blogModel.findOneAndUpdate( { _id : id } , { $set : dataforUpdation} , { new : true} )
 
     if( !updatedData )  return res.status(404).send({error : "No such data found "})
     res.status(200).send( { msg: updatedData})
@@ -65,12 +69,16 @@ const deleteBlogByPath = async function (req, res) {
         let blogId = req.params.blogId;
 
         if (!blogId) return res.status(400).send({ error: "blogId should be present in params" });
-        let blog = await blogModel.findById(blogId);
+       
+        const data = await blogModel.find({ _id : blogId})
+        if(!data)  return res.status(400).send({error : "Invalid blogId"})
 
-        if (!blog) {
-            return res.status(404).send("No such blog exists");
-        }
-        let deletedBlog = await blogModel.findOneAndUpdate({ _id: blogId }, { isDeleted: true }, { new: true });
+        
+        const timeDate = moment()
+
+        const dataforUpdation = { ...data , isDeleted : true , deletedAt : timeDate}
+
+        let deletedBlog = await blogModel.findByIdAndUpdate({ _id: blogId }, dataforUpdation, { new: true });
         res.send({ status: "Deleted", data: deletedBlog });
 
     }
@@ -89,7 +97,11 @@ const deleteBlogByQuery = async function (req, res) {
 
         if (!data) return res.status(400).send({ error: "Please enter some data to campare" })
 
-        const result = await blogModel.updateMany(data, { $set: { isDeleted: false } }, { new: true })
+        const timeDate = moment()
+
+        const dataforUpdation = { ...data , isDeleted : true , deletedAt : timeDate}
+
+        const result = await blogModel.updateMany(data, dataforUpdation , { new: true })
 
         if (!result) res.status(404).send({ error: " No data found" })
 

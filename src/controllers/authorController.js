@@ -24,14 +24,14 @@ const loginAuthor = async function (req, res) {
     if( !email )  return  res.status(400).send({error : " Please , enter email Id"})
     if( !password )  return  res.status(400).send({error : " Please , enter password"})
   
-    let user = await authorModel.findOne({ email: email, password: password });
-    if (!user)
-      return res.send({
+    let author = await authorModel.findOne({ email: email, password: password });
+    if (!author)
+      return res.status(404).send({
         status: false,
         msg: "username or the password is not corerct",
       });
   
-    let token = jwt.sign({ userId: user._id.toString() }, "secuiretyKeyToCheckToken" );
+    let token = jwt.sign({ authorId: author._id.toString() }, "secuiretyKeyToCheckToken" );
     res.setHeader("x-api-key", token);
     res.status(200).send({ status: "Author log-in successfully", data: token });
   }

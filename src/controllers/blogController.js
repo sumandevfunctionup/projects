@@ -66,20 +66,14 @@ const updateBlog= async function (req, res) {
 
 const deleteBlogByPath = async function (req, res) {
     try {
-        let blogId = req.params.blogId;
-
-        if (!blogId) return res.status(400).send({ error: "blogId should be present in params" });
-       
-        const data = await blogModel.find({ _id : blogId})
-        if(!data)  return res.status(400).send({error : "Invalid blogId"})
-
-        
         const timeDate = moment()
 
         const dataforUpdation = { isDeleted : true , deletedAt : timeDate}
 
         let deletedBlog = await blogModel.findByIdAndUpdate({ _id: blogId }, dataforUpdation, { new: true });
-        res.send({ status: "Deleted", data: deletedBlog });
+
+        if( !deletedBlog)  return  res.status(404).send({ error : " No data exist"})
+        res.status(200).send({ status: "Deleted", data: deletedBlog });
 
     }
     catch (err) {
@@ -93,7 +87,6 @@ const deleteBlogByPath = async function (req, res) {
 const deleteBlogByQuery = async function (req, res) {
     try {
         const data = req.query
-        console.log(data)
 
         if (!data) return res.status(400).send({ error: "Please enter some data to campare" })
 
@@ -105,7 +98,7 @@ const deleteBlogByQuery = async function (req, res) {
 
         if (!result) res.status(404).send({ error: " No data found" })
 
-        res.status(200).send({ data: result })
+        res.send({ status: "Deleted", data: result });
     }
     catch (err) {
         console.log(err)

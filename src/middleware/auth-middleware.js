@@ -1,6 +1,7 @@
 const jwt = require("jsonwebtoken")
+const blogModel = require("../models/blogModel")
 
-const authentication = async function ( req , res , next ) {
+const authentication = function ( req , res , next ) {
     let isToken = req.headers["x-api-key"]
     if ( !isToken ) {
         return res.status(400).send({ status: false, msg: "token must be present" });
@@ -21,12 +22,18 @@ const authorization = async function ( req , res , next ) {
  
     let decodedToken = jwt.verify(isToken, "secuiretyKeyToCheckToken");
 
-    let userId = req.params.userId
-    if( !userId )   userId = req.query._id
-    if( !userId )   return res.status(400).send({error : " Please , enter userId"})
+    let blogId = req.params.blogId
+    if( !blogId )   blogId = req.query.blogId
+    if( !blogId )   return res.status(400).send({error : " Please , enter blogId"})
 
-    if ( decodedToken.userId != userId ) {
-        return res.status(403).send({ error : " LogedIn user is not authorize to change with requested userid"})
+    const data = await blogModel.find({ _id : blogId})
+    if(!data)  return res.status(400).send({error : "Invalid blogId"})
+
+    let authorId = await blogModel.find({ _id : blogId }).select({ authorId : 1 , _id : 0})
+    authorId = authorId.map( x => x.authorId)
+
+    if ( decodedToken.authorId != authorId ) {
+        return res.status(403).send({ error : " LogedIn author is not authorize to change with requested userid"})
     }
     
     next();

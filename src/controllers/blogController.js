@@ -76,7 +76,7 @@ const deleteBlogByPath = async function (req, res) {
         
         const timeDate = moment()
 
-        const dataforUpdation = { ...data , isDeleted : true , deletedAt : timeDate}
+        const dataforUpdation = { isDeleted : true , deletedAt : timeDate}
 
         let deletedBlog = await blogModel.findByIdAndUpdate({ _id: blogId }, dataforUpdation, { new: true });
         res.send({ status: "Deleted", data: deletedBlog });
@@ -99,7 +99,7 @@ const deleteBlogByQuery = async function (req, res) {
 
         const timeDate = moment()
 
-        const dataforUpdation = { ...data , isDeleted : true , deletedAt : timeDate}
+        const dataforUpdation = { isDeleted : true , deletedAt : timeDate}
 
         const result = await blogModel.updateMany(data, dataforUpdation , { new: true })
 

@@ -44,9 +44,6 @@ const getBlogs = async function( req , res ) {
 const updateBlog= async function (req, res) {
     try {
     let data = req.body
-    const id = req.params.blogId
-    
-    if( !id )  return res.status(400).send({error : " Please enter id in Params"})
     if ( !data )  return res.status(400).send({ error : "Enter some data to update"})     
 
     const timeDate = moment()
@@ -91,7 +88,6 @@ const deleteBlogByQuery = async function (req, res) {
         if (!data) return res.status(400).send({ error: "Please enter some data to campare" })
 
         const timeDate = moment()
-
         const dataforUpdation = { isDeleted : true , deletedAt : timeDate}
 
         const result = await blogModel.updateMany(data, dataforUpdation , { new: true })

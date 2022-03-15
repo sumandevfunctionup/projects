@@ -33,7 +33,7 @@ const loginAuthor = async function (req, res) {
   
     let token = jwt.sign({ userId: user._id.toString() }, "secuiretyKeyToCheckToken" );
     res.setHeader("x-api-key", token);
-    res.send({ status: "Author log-in successfully", data: token });
+    res.status(200).send({ status: "Author log-in successfully", data: token });
   }
 
 module.exports.createAuthor = createAuthor

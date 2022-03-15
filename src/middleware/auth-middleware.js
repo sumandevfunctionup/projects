@@ -3,12 +3,12 @@ const jwt = require("jsonwebtoken")
 const authentication = async function ( req , res , next ) {
     let isToken = req.headers["x-api-key"]
     if ( !isToken ) {
-        res.send({ status: false, msg: "token must be present" });
+        return res.status(400).send({ status: false, msg: "token must be present" });
     }
  
     let decodedToken = jwt.verify(isToken, "secuiretyKeyToCheckToken");
     if ( !decodedToken ) {
-        res.send({ status: false, msg: "token is invalid" });
+        return res.status(401).send({ status: false, msg: "token is invalid" });
     }
 
     next();
@@ -26,7 +26,7 @@ const authorization = async function ( req , res , next ) {
     if( !userId )   return res.status(400).send({error : " Please , enter userId"})
 
     if ( decodedToken.userId != userId ) {
-        return res.send({ error : " LogedIn user is not authorize to change with requested userid"})
+        return res.status(403).send({ error : " LogedIn user is not authorize to change with requested userid"})
     }
     
     next();
